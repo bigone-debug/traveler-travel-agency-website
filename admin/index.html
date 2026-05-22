@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Админ-панель - TRAVELER</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #FE7A15;
+            --dark-color: #2C3E50;
+            --light-bg: #F8F9FA;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background: var(--dark-color);
+            padding-top: 20px;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .sidebar .logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar .logo h3 {
+            color: var(--primary-color);
+            margin: 0;
+        }
+        
+        .sidebar .logo span {
+            color: white;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        
+        .sidebar-menu li {
+            padding: 0;
+        }
+        
+        .sidebar-menu li a {
+            display: block;
+            padding: 15px 25px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background: rgba(254, 122, 21, 0.1);
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .sidebar-menu li a i {
+            margin-right: 10px;
+            width: 20px;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .top-bar {
+            background: white;
+            padding: 15px 30px;
+            margin: -20px -20px 20px -20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .stats-card .icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            margin-bottom: 15px;
+        }
+        
+        .stats-card h3 {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .stats-card p {
+            color: #6c757d;
+            margin: 0;
+        }
+        
+        .content-section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-bg);
+        }
+        
+        .section-header h2 {
+            margin: 0;
+            color: var(--dark-color);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #e56a0a;
+            border-color: #e56a0a;
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .table-actions button {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .modal-header {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .modal-header .close {
+            color: white;
+        }
+        
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: -250px;
+            }
+            
+            .sidebar.active {
+                margin-left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-toggle {
+                display: block !important;
+            }
+        }
+        
+        .mobile-toggle {
+            display: none;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <h3><span>TRAVEL</span>ER</h3>
+            <small style="color: rgba(255,255,255,0.5);">Админ-панель</small>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li><a href="#" class="menu-link active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> Панель управления</a></li>
+            <li><a href="#" class="menu-link" data-section="packages"><i class="fas fa-box"></i> Турпакеты</a></li>
+            <li><a href="#" class="menu-link" data-section="destinations"><i class="fas fa-map-marked-alt"></i> Направления</a></li>
+            <li><a href="#" class="menu-link" data-section="blog"><i class="fas fa-blog"></i> Блог</a></li>
+            <li><a href="#" class="menu-link" data-section="guides"><i class="fas fa-users"></i> Гиды</a></li>
+            <li><a href="#" class="menu-link" data-section="testimonials"><i class="fas fa-comments"></i> Отзывы</a></li>
+            <li><a href="#" class="menu-link" data-section="bookings"><i class="fas fa-calendar-check"></i> Бронирования</a></li>
+            <li><a href="#" class="menu-link" data-section="contacts"><i class="fas fa-envelope"></i> Контакты</a></li>
+            <li><a href="#" class="menu-link" data-section="settings"><i class="fas fa-cog"></i> Настройки сайта</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div>
+                <button class="mobile-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h4 class="d-inline-block mb-0 ml-3">Добро пожаловать, <span id="admin-name">Администратор</span></h4>
+            </div>
+            <div>
+                <button class="btn btn-outline-primary btn-sm" onclick="window.open('../index.html', '_blank')">
+                    <i class="fas fa-eye"></i> Просмотр сайта
+                </button>
+                <button id="logout-btn" class="btn btn-outline-danger btn-sm ml-2" onclick="logoutAdmin()">
+                    <i class="fas fa-sign-out-alt"></i> Выход
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div class="content-section active" id="dashboard">
+            <h2 class="mb-4">Статистика</h2>
+            <div class="dashboard-grid">
+                <div class="stats-card">
+                    <div class="icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <h3 id="stats-packages">0</h3>
+                    <p>Турпакетов</p>
+                </div>
+                
+                <div class="stats-card">
+                    <div class="icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <h3 id="stats-destinations">0</h3>
+                    <p>Направлений</p>
+                </div>
+                
+                <div class="stats-card">
+                    <div class="icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <i class="fas fa-blog"></i>
+                    </div>
+                    <h3 id="stats-blog">0</h3>
+                    <p>Статей в блоге</p>
+                </div>
+                
+                <div class="stats-card">
+                    <div class="icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3 id="stats-bookings">0</h3>
+                    <p>Бронирований</p>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="stats-card">
+                        <h5>Последние бронирования</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Направление</th>
+                                        <th>Даты поездки</th>
+                                        <th>Длительность</th>
+                                        <th>Статус</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-bookings">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Нет данных</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Packages Section -->
+        <div class="content-section" id="packages">
+            <div class="section-header">
+                <h2>Управление турпакетами</h2>
+                <button class="btn btn-primary" onclick="openPackageModal()">
+                    <i class="fas fa-plus"></i> Добавить турпакет
+                </button>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Изображение</th>
+                            <th>Название</th>
+                            <th>Направление</th>
+                            <th>Длительность</th>
+                            <th>Цена</th>
+                            <th>Рейтинг</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="packages-list">
+                        <!-- Packages will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Destinations Section -->
+        <div class="content-section" id="destinations">
+            <div class="section-header">
+                <h2>Управление направлениями</h2>
+                <button class="btn btn-primary" onclick="openDestinationModal()">
+                    <i class="fas fa-plus"></i> Добавить направление
+                </button>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Изображение</th>
+                            <th>Название</th>
+                            <th>Количество городов</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="destinations-list">
+                        <!-- Destinations will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Blog Section -->
+        <div class="content-section" id="blog">
+            <div class="section-header">
+                <h2>Управление блогом</h2>
+                <button class="btn btn-primary" onclick="openBlogModal()">
+                    <i class="fas fa-plus"></i> Добавить статью
+                </button>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Изображение</th>
+                            <th>Заголовок</th>
+                            <th>Категория</th>
+                            <th>Дата</th>
+                            <th>Автор</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="blog-list">
+                        <!-- Blog posts will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Guides Section -->
+        <div class="content-section" id="guides">
+            <div class="section-header">
+                <h2>Управление гидами</h2>
+                <button class="btn btn-primary" onclick="openGuideModal()">
+                    <i class="fas fa-plus"></i> Добавить гида
+                </button>
+            </div>
+            
+            <div class="row" id="guides-list">
+                <!-- Guides will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Testimonials Section -->
+        <div class="content-section" id="testimonials">
+            <div class="section-header">
+                <h2>Управление отзывами</h2>
+                <button class="btn btn-primary" onclick="openTestimonialModal()">
+                    <i class="fas fa-plus"></i> Добавить отзыв
+                </button>
+            </div>
+            
+            <div class="row" id="testimonials-list">
+                <!-- Testimonials will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Bookings Section -->
+        <div class="content-section" id="bookings">
+            <div class="section-header">
+                <h2>Бронирования</h2>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Дата создания</th>
+                            <th>Направление</th>
+                            <th>Дата отправления</th>
+                            <th>Дата возвращения</th>
+                            <th>Длительность</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookings-list">
+                        <!-- Bookings will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Contacts Section -->
+        <div class="content-section" id="contacts">
+            <div class="section-header">
+                <h2>Сообщения от клиентов</h2>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Имя</th>
+                            <th>Email</th>
+                            <th>Тема</th>
+                            <th>Сообщение</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contacts-list">
+                        <!-- Contacts will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div class="content-section" id="settings">
+            <div class="section-header">
+                <h2>Настройки сайта</h2>
+            </div>
+            
+            <form id="settings-form">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="mb-3">Контактная информация</h5>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" class="form-control" id="site-email" value="info@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Телефон</label>
+                            <input type="text" class="form-control" id="site-phone" value="+012 345 6789">
+                        </div>
+                        <div class="form-group">
+                            <label>Адрес</label>
+                            <input type="text" class="form-control" id="site-address" value="Location, City, Country">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5 class="mb-3">Социальные сети</h5>
+                        <div class="form-group">
+                            <label>Facebook</label>
+                            <input type="url" class="form-control" id="social-facebook" placeholder="https://facebook.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label>Twitter</label>
+                            <input type="url" class="form-control" id="social-twitter" placeholder="https://twitter.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label>Instagram</label>
+                            <input type="url" class="form-control" id="social-instagram" placeholder="https://instagram.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label>LinkedIn</label>
+                            <input type="url" class="form-control" id="social-linkedin" placeholder="https://linkedin.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label>YouTube</label>
+                            <input type="url" class="form-control" id="social-youtube" placeholder="https://youtube.com/...">
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-lg mt-3">
+                    <i class="fas fa-save"></i> Сохранить настройки
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modals will be added via JavaScript -->
+    <div id="modals-container"></div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script>
+        if (localStorage.getItem('admin_logged_in') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        function logoutAdmin() {
+            localStorage.removeItem('admin_logged_in');
+            localStorage.removeItem('admin_username');
+            window.location.href = 'login.html';
+        }
+    </script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
